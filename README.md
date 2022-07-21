@@ -11,7 +11,8 @@
 
 In practice, only the function `create_header_logo_PDF` realizes the step 1;
 another function `stamp_pdf` realizes step 2 and 3.
-The script file `add_stamp.py` shows an example usage including all of them.
+
+Please refer to `tests/test_stamp.py` for an example usage including all of them.
 
 ## Usage of functions
 ### `stamp_pdf`
