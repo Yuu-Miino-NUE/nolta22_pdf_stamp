@@ -5,6 +5,16 @@ from reportlab.lib.units import cm, mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# User settings
+logo_pos_x = 84*mm
+logo_pos_y = 272*mm
+logo_width = 18*mm
+logo_file = './img/logo.png'
+lines = [
+    '2022 International Symposium on Nonlinear Theory and Its Applications,',
+    'NOLTA2022, Virtual, December 12-15, 2022'
+]
+
 # Font handling
 FONT = "Times"
 pdfmetrics.registerFont(TTFont('Times','./ttfs/Times New Roman.ttf'))
@@ -25,29 +35,25 @@ def put_text(c, line: str, pos_x, pos_y):
     t.setTextOrigin(pos_x, pos_y)
     t.textLine(line)
     c.drawText(t)
-    
 
-def create_header_logo_PDF():
-    # 新規PDF作成
+def create_header_logo_PDF(logo_name: str, pos_x, pos_y, logo_width, lines):
+    # Create destination canvas
     pdf_canvas = canvas.Canvas('pdf_template/header_logo.pdf', pagesize=A4)
-
-    # 画像を挿入する
-    target_x, target_y = 84*mm, 272*mm
-    logo_name = './img/logo.png'
-    logo_width = 18*mm
     logo_height = get_height(logo_name, logo_width)
-    pdf_canvas.drawImage(logo_name, target_x, target_y,
+
+    # Insert logo
+    pdf_canvas.drawImage(logo_name, pos_x, pos_y,
                          width=logo_width, height=logo_height, mask='auto')
 
-    base_x = target_x+logo_width+3*mm
-    base_y = target_y+logo_height-3.5*mm
-    put_text(pdf_canvas, '2022 International Symposium on Nonlinear Theory and Its Applications,',
-             base_x, base_y)
-    put_text(pdf_canvas, 'NOLTA2022, Virtual, December 12-15, 2022',
-             base_x, base_y-4*mm)
+    base_x = pos_x+(logo_width*1.15)
+    base_y = pos_y+(logo_height/2.0+(1.0*mm*(len(lines)-1)))
 
-    # PDF保存
+    for i, l in enumerate(lines):
+        put_text(pdf_canvas, l, base_x, base_y-(4*mm*i))
+
+    # Save canvas as a PDF
     pdf_canvas.save()
 
-
-create_header_logo_PDF()
+# Run as a script
+if __name__=="__main__":
+    create_header_logo_PDF(logo_file, logo_pos_x, logo_pos_y, logo_width, lines)
