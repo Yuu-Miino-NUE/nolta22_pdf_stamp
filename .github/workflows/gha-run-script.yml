@@ -7,14 +7,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  add_stamp:
+  builds:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v3
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
           architecture: 'x64'
       - name: Get Python version
         run: python -V
@@ -27,5 +31,23 @@ jobs:
           pip install pytest
           pip install pytest-cov
           pytest add_stamp.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+      - name: Run Python
+        run: python add_stamp.py
+
+  add_stamp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+      - name: Get Python version
+        run: python -V
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Run Python
         run: python add_stamp.py
