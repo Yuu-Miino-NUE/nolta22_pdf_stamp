@@ -1,6 +1,6 @@
-# StampTools for logo and page number stamping on PDF
+# StampTools for logo and page number
 
-* Can add logos and page numbers without stripping any hyper-links
+* Can add logos and page numbers on PDF without stripping any hyper-links
 
 ## Main Scheme
 1. Make template PDF including logo in `pdf_template` directory (should do only once)
