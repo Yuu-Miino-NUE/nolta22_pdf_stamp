@@ -11,10 +11,6 @@ In practice, only the function `create_header_logo_PDF` realizes the step 1;
 another function `stamp_pdf` realizes step 2 and 3.
 The script file `add_stamp.py` shows an example usage including all of them.
 
-## Requirements
-* PyPDF2 v2.6.0 ([pypi package](https://pypi.org/project/PyPDF2/2.6.0/))
-* ReportLab v3.6.11 ([pypi package](https://pypi.org/project/reportlab/3.6.11/))
-
 ## Usage of functions
 ### `stamp_pdf`
 #### Parameters
