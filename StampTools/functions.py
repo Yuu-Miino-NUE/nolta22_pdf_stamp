@@ -55,10 +55,11 @@ def stamp_pdf(input_file_path, output_file_path, encl: str="em", start_num: int 
 
     bs = io.BytesIO()
     c = canvas.Canvas(bs)
-    for i in range(0, page_count):
+    for i in range(page_count):
         pdf_page = input_file.getPage(i)
         page_size = get_page_size(pdf_page)
         create_page_number_pdf(c, page_size, i+start_num, num_height, encl)
+        
     c.save()
 
     pdf_num_reader = PdfFileReader(bs)
@@ -79,6 +80,7 @@ def stamp_pdf(input_file_path, output_file_path, encl: str="em", start_num: int 
         output_file.write(outputStream)
 
     bs.close()
+    return page_count+start_num
 
 def get_height(path, width=1*cm):
     img = utils.ImageReader(path)

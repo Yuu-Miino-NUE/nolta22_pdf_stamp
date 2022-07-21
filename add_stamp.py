@@ -20,5 +20,10 @@ if not exists(HEADER_LOGO_PATH):
 
 
 # Stamp PDF (add logo and page numbers)
-stamp_pdf('./nolta2022.pdf', './nolta2022_stamped.pdf', encl = "en_dash")
+pdfs = {
+    './nolta2022.pdf': './nolta2022_stamped.pdf'
+}
 
+start_num = 1
+for pdfin, pdfout in pdfs.items():
+    start_num = stamp_pdf(pdfin, pdfout, encl = "en_dash", start_num=start_num)
