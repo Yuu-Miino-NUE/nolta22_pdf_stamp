@@ -26,5 +26,3 @@ jobs:
         run: |
           pip install pytest
           pytest
-      - name: Run Python
-        run: python add_stamp.py

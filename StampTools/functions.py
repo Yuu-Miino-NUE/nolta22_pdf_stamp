@@ -1,5 +1,5 @@
 import io
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -39,42 +39,42 @@ def create_page_number_pdf(c: canvas.Canvas, page_size: tuple, page_num: int, nu
     c.showPage()
     
 def get_page_size(page) -> tuple:
-    page_box = page.mediaBox
-    width  = page_box.getUpperRight_x() - page_box.getLowerLeft_x()
-    height = page_box.getUpperRight_y() - page_box.getLowerLeft_y()
+    page_box = page.mediabox
+    width  = page_box.right - page_box.left
+    height = page_box.top - page_box.bottom
     return float(width), float(height)
 
 def stamp_pdf(input_file_path, output_file_path, encl: str="em", start_num: int = 1, num_height = 10.5*mm):
-    header_logo_pdf = PdfFileReader(open(HEADER_LOGO_PATH, "rb"))
-    header_logo_page = header_logo_pdf.getPage(0)
+    header_logo_pdf = PdfReader(open(HEADER_LOGO_PATH, "rb"))
+    header_logo_page = header_logo_pdf.pages[0]
 
-    input_file = PdfFileReader(open(input_file_path, 'rb'), strict=False)
-    page_count = input_file.getNumPages()
+    input_file = PdfReader(open(input_file_path, 'rb'), strict=False)
+    page_count = len(input_file.pages)
 
-    output_file = PdfFileWriter()
+    output_file = PdfWriter()
 
     bs = io.BytesIO()
     c = canvas.Canvas(bs)
     for i in range(page_count):
-        pdf_page = input_file.getPage(i)
+        pdf_page = input_file.pages[i]
         page_size = get_page_size(pdf_page)
         create_page_number_pdf(c, page_size, i+start_num, num_height, encl)
         
     c.save()
 
-    pdf_num_reader = PdfFileReader(bs)
+    pdf_num_reader = PdfReader(bs)
 
     for page_number in range(page_count):
-        input_page = input_file.getPage(page_number)
-        pdf_num    = pdf_num_reader.getPage(page_number)
+        input_page = input_file.pages[page_number]
+        pdf_num    = pdf_num_reader.pages[page_number]
 
-        input_page.mergePage(pdf_num)
+        input_page.merge_page(pdf_num)
 
         if page_number == 0:
-            input_page.mergePage(header_logo_page)
-            input_page.compressContentStreams()
+            input_page.merge_page(header_logo_page)
+            input_page.compress_content_streams()
 
-        output_file.addPage(input_page)
+        output_file.add_page(input_page)
 
     with open(output_file_path, "wb") as outputStream:
         output_file.write(outputStream)
