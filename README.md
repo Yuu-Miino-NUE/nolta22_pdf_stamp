@@ -14,23 +14,23 @@ The script file `add_stamp.py` shows an example usage including all of them.
 ## Usage of functions
 ### `stamp_pdf`
 #### Parameters
-* input_file_path
-* output_file_path
-* encl: enclosure of the page number  
+* `input_file_path`
+* `output_file_path`
+* `encl`: enclosure of the page number  
   (available options: `"en_dash", "em_dash", "minus", "parens", "page", "Page"`)
-* start_num: page number of the first page for the input file
-* num_height: height of the page number
+* `start_num`: page number of the first page for the input file
+* `num_height`: height of the page number
 
 #### Return
 * start_num for next loop
 
 ### `create_header_logo_PDF`
 #### Parameters
-* logo_file_path
-* pos_x: horizontal position of logo
-* pos_y: vertical position of logo
-* logo_width: width of logo (height will automatically change with keeping aspect ratio)
-* lines: list of sentences to show on the right side of the logo
+* `logo_file_path`
+* `pos_x`: horizontal position of logo
+* `pos_y`: vertical position of logo
+* `logo_width`: width of logo (height will automatically change with keeping aspect ratio)
+* `lines`: list of sentences to show on the right side of the logo
 
 #### Return
 None
