@@ -32,10 +32,10 @@ pdfmetrics.registerFont(TTFont('Timesbd','StampTools/ttfs/Times New Roman Bold.t
 pdfmetrics.registerFontFamily(FONT, normal='Times', bold='Timesbd', italic='Timesi',)
 
 # Main functions
-def create_page_number_pdf(c: canvas.Canvas, page_size: tuple, page_num: int, page_height, encl):
+def create_page_number_pdf(c: canvas.Canvas, page_size: tuple, page_num: int, num_height, encl):
     c.setPageSize(page_size)
     c.setFont(FONT, 11)
-    c.drawCentredString(page_size[0] / 2.0, page_height, format_number(page_num, encl))
+    c.drawCentredString(page_size[0] / 2.0, num_height, format_number(page_num, encl))
     c.showPage()
     
 def get_page_size(page) -> tuple:
@@ -44,7 +44,7 @@ def get_page_size(page) -> tuple:
     height = page_box.getUpperRight_y() - page_box.getLowerLeft_y()
     return float(width), float(height)
 
-def stamp_pdf(input_file_path, output_file_path, encl: str="em", start_num: int = 1, page_height = 10.5*mm):
+def stamp_pdf(input_file_path, output_file_path, encl: str="em", start_num: int = 1, num_height = 10.5*mm):
     header_logo_pdf = PdfFileReader(open(HEADER_LOGO_PATH, "rb"))
     header_logo_page = header_logo_pdf.getPage(0)
 
@@ -58,7 +58,7 @@ def stamp_pdf(input_file_path, output_file_path, encl: str="em", start_num: int 
     for i in range(0, page_count):
         pdf_page = input_file.getPage(i)
         page_size = get_page_size(pdf_page)
-        create_page_number_pdf(c, page_size, i+start_num, page_height, encl)
+        create_page_number_pdf(c, page_size, i+start_num, num_height, encl)
     c.save()
 
     pdf_num_reader = PdfFileReader(bs)
@@ -93,13 +93,13 @@ def put_text(c, line: str, pos_x, pos_y):
     t.textLine(line)
     c.drawText(t)
 
-def create_header_logo_PDF(logo_name: str, pos_x, pos_y, logo_width, lines):
+def create_header_logo_PDF(logo_file_path: str, pos_x, pos_y, logo_width, lines):
     # Create destination canvas
     pdf_canvas = canvas.Canvas(HEADER_LOGO_PATH, pagesize=A4)
-    logo_height = get_height(logo_name, logo_width)
+    logo_height = get_height(logo_file_path, logo_width)
 
     # Insert logo
-    pdf_canvas.drawImage(logo_name, pos_x, pos_y,
+    pdf_canvas.drawImage(logo_file_path, pos_x, pos_y,
                          width=logo_width, height=logo_height, mask='auto')
 
     base_x = pos_x+(logo_width*1.15)
