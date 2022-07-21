@@ -22,7 +22,7 @@ The script file `add_stamp.py` shows an example usage including all of them.
 * num_height: height of the page number
 
 #### Return
-None
+* start_num for next loop
 
 ### `create_header_logo_PDF`
 #### Parameters
