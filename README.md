@@ -17,7 +17,7 @@ The script file `add_stamp.py` shows an example usage including all of them.
 * input_file_path
 * output_file_path
 * encl: enclosure of the page number  
-  (available options: "en_dash", "em_dash", "minus", "parens", "page", "Page")
+  (available options: `"en_dash", "em_dash", "minus", "parens", "page", "Page"`)
 * start_num: page number of the first page of the input file
 * num_height: height of the page number
 
