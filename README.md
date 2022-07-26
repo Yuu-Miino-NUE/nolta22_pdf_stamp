@@ -1,6 +1,6 @@
 # StampTools for logo and page number
 
-[![Run Script](https://github.com/Yuu-Miino-NUE/nolta22_pdf_stamp/actions/workflows/gha-run-script.yml/badge.svg)](https://github.com/Yuu-Miino-NUE/nolta22_pdf_stamp/actions/workflows/gha-run-script.yml)
+[![Test](https://github.com/Yuu-Miino-NUE/nolta22_pdf_stamp/actions/workflows/test.yml/badge.svg)](https://github.com/Yuu-Miino-NUE/nolta22_pdf_stamp/actions/workflows/test.yml)
 
 * Can add logos and page numbers on PDF without stripping any hyper-links
 
