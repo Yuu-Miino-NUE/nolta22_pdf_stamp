@@ -1,5 +1,6 @@
 import io
 from typing import Literal, BinaryIO
+from collections.abc import Callable
 
 from PyPDF2 import PdfWriter, PdfReader, PageObject
 from reportlab.pdfgen import canvas
@@ -49,7 +50,7 @@ def _put_page_numbers(
     num_height: float,
     encl: NumberEnclosure,
 ):
-    _c = canvas.Canvas(buffer)  # Associate canvas with buffer
+    _c = canvas.Canvas(buffer, pagesize=A4)  # Associate canvas with buffer
     for i in range(len(base_pdf.pages)):
         page_size = _get_page_size(base_pdf.pages[i])
         _c.setPageSize(page_size)  # Width and height of page
@@ -71,7 +72,7 @@ def _get_page_size(page: PageObject) -> tuple[float, float]:
 def stamp_pdf(
     input: str,
     output: str,
-    first_page_overlay: str | None = None,
+    first_page_overlay: PdfReader | None = None,
     encl: NumberEnclosure = "em_dash",
     start_num: int = 1,
     num_height: float = 10.5 * mm,
@@ -98,7 +99,7 @@ def stamp_pdf(
     """
     if first_page_overlay is not None:
         try:
-            _fpo = PdfReader(open(first_page_overlay, "rb")).pages[0]
+            _fpo = first_page_overlay.pages[0]
         except:
             raise FileExistsError("No header logo PDF found. Please create one first.")
     else:
@@ -179,12 +180,12 @@ def put_logo_with_text(
     """
 
     # Create destination canvas
-    pdf_canvas = canvas.Canvas(output, pagesize=A4)
+    _canvas = canvas.Canvas(output, pagesize=A4)
 
     # Insert logo if not None
     if logo_file is not None:
         logo_height = _get_height(logo_file, logo_width)
-        pdf_canvas.drawImage(
+        _canvas.drawImage(
             logo_file, pos_x, pos_y, width=logo_width, height=logo_height, mask="auto"
         )
     else:
@@ -193,11 +194,67 @@ def put_logo_with_text(
 
     # Insert text if not empty
     if len(text_lines) != 0:
-        base_x = pos_x + (logo_width * 1.15)
-        base_y = pos_y + (logo_height / 2.0 + (1.0 * mm * (len(text_lines) - 1)))
+        _x = pos_x + (logo_width * 1.15)
+        _y = pos_y + (logo_height / 2.0 + (1.0 * mm * (len(text_lines) - 1)))
 
         for i, l in enumerate(text_lines):
-            _put_text(pdf_canvas, l, base_x, base_y - (4 * mm * i), fontsize)
+            _put_text(_canvas, l, _x, _y - (4 * mm * i), fontsize)
 
     # Save canvas
-    pdf_canvas.save()
+    _canvas.save()
+
+
+def _put_item(pdf_name: str, fun: Callable[[canvas.Canvas], None]):
+    try:
+        present_pdf = PdfReader(pdf_name).pages[0]
+    except:
+        raise FileExistsError("No PDF found at input.")
+
+    # Make canvas of img_file in buffer
+    buffer = io.BytesIO()
+    _canvas = canvas.Canvas(buffer, pagesize=A4)
+    fun(_canvas)
+    _canvas.save()
+
+    # Merge canvas to loaded pdf
+    present_pdf.merge_page(PdfReader(buffer).pages[0])
+    present_pdf.compress_content_streams()
+
+    # Overwrite to output file
+    writer = PdfWriter()
+    writer.add_page(present_pdf)
+    writer.write(open(pdf_name, "wb"))
+
+
+def put_image(
+    pdf_name: str,
+    img_file: str,
+    img_width: float,
+    x: float,
+    y: float,
+):
+    def fun(_canvas):
+        _canvas.drawImage(
+            img_file,
+            x=x,
+            y=y,
+            width=img_width,
+            height=_get_height(img_file, img_width),
+            mask="auto",
+        )
+
+    _put_item(pdf_name, fun)
+
+
+def put_text(
+    pdf_name: str,
+    text_lines: list[str],
+    x: float,
+    y: float,
+    fontsize: int = 8,
+) -> None:
+    def fun(_canvas):
+        for i, l in enumerate(text_lines):
+            _put_text(_canvas, l, x, y - (3.2 * mm * i), fontsize)
+
+    _put_item(pdf_name, fun)
