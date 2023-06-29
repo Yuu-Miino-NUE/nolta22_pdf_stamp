@@ -9,7 +9,7 @@
 2. Make template PDF including page numbers in buffer (runs for every page implicitly)
 3. Merge manuscript PDF and template PDFs (1 and 2)
 
-In practice, only the function `create_header_logo_PDF` realizes the step 1;
+In practice, only the function `put_logo_with_text` realizes the step 1;
 another function `stamp_pdf` realizes step 2 and 3.
 
 Please refer to `tests/test_stamp.py` for an example usage including all of them.
@@ -17,8 +17,9 @@ Please refer to `tests/test_stamp.py` for an example usage including all of them
 ## Usage of functions
 ### `stamp_pdf`
 #### Parameters
-* `input_file_path`
-* `output_file_path`
+* `input`
+* `output`
+* `first_page_overlay`: path of a PDF to overlay to an input
 * `encl`: enclosure of the page number  
   (available options: `"en_dash", "em_dash", "minus", "parens", "page", "Page"`)
 * `start_num`: page number of the first page for the input file
@@ -27,13 +28,15 @@ Please refer to `tests/test_stamp.py` for an example usage including all of them
 #### Return
 * start_num for next loop
 
-### `create_header_logo_PDF`
+### `put_logo_with_text`
 #### Parameters
-* `logo_file_path`
+* `output`: binary pointer to output
+* `text_lines`: list of sentences to show on the right side of the logo
+* `logo_file`: logo file path
 * `pos_x`: horizontal position of logo
 * `pos_y`: vertical position of logo
 * `logo_width`: width of logo (height will automatically change with keeping aspect ratio)
-* `lines`: list of sentences to show on the right side of the logo
+* `fontsize`: font size
 
 #### Return
 None
