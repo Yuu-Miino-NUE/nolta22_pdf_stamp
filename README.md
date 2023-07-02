@@ -41,6 +41,11 @@ Please refer to `tests/test_stamp.py` for an example usage including all of them
 #### Return
 None
 
+## Fonts
+You can use any fonts you have by registering them with `pdfmetrics.registerFont`,
+see [here](https://docs.reportlab.com/reportlab/userguide/ch3_fonts/#truetype-font-support)
+for detail.
+
 ## References
 * https://serip39.hatenablog.com/entry/2021/01/18/170000
 * https://gammasoft.jp/python-example/python-add-page-number-to-pdf/

@@ -64,7 +64,7 @@ def test_stamp():
             item["input"],
             item["output"],
             first_page_overlay=PdfReader(f),
-            encl="em_dash",
+            encl="en_dash",
             start_num=start_num,
         )
         print("done")

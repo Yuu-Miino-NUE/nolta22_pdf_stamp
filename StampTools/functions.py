@@ -4,8 +4,6 @@ from collections.abc import Callable
 
 from PyPDF2 import PdfWriter, PdfReader, PageObject
 from reportlab.pdfgen import canvas
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import utils
 from reportlab.lib.units import cm, mm
@@ -21,7 +19,11 @@ NUMBER_ENCLOSURE_DICT = {
     "Page": ["P.", ""],
 }
 
+# Font handling
+DEFAULT_FONT = "Times-Roman"
 
+
+# Main functions
 def _format_number(num: int, encl: NumberEnclosure) -> str:
     start, end = NUMBER_ENCLOSURE_DICT[encl]
 
@@ -29,32 +31,19 @@ def _format_number(num: int, encl: NumberEnclosure) -> str:
     return "{}".format(utf_string)
 
 
-# Font handling
-FONT = "Times"
-pdfmetrics.registerFont(TTFont("Times", "StampTools/ttfs/Times New Roman.ttf"))
-pdfmetrics.registerFont(TTFont("Timesi", "StampTools/ttfs/Times New Roman Italic.ttf"))
-pdfmetrics.registerFont(TTFont("Timesbd", "StampTools/ttfs/Times New Roman Bold.ttf"))
-pdfmetrics.registerFontFamily(
-    FONT,
-    normal="Times",
-    bold="Timesbd",
-    italic="Timesi",
-)
-
-
-# Main functions
 def _put_page_numbers(
     buffer: BinaryIO,
     base_pdf: PdfReader,
     start_page: int,
     num_height: float,
     encl: NumberEnclosure,
+    font: str,
 ):
     _c = canvas.Canvas(buffer, pagesize=A4)  # Associate canvas with buffer
     for i in range(len(base_pdf.pages)):
         page_size = _get_page_size(base_pdf.pages[i])
         _c.setPageSize(page_size)  # Width and height of page
-        _c.setFont(FONT, 11)
+        _c.setFont(font, 11)
         _c.drawCentredString(
             page_size[0] / 2.0, num_height, _format_number(start_page + i, encl)
         )
@@ -76,6 +65,7 @@ def stamp_pdf(
     encl: NumberEnclosure = "em_dash",
     start_num: int = 1,
     num_height: float = 10.5 * mm,
+    font: str = DEFAULT_FONT,
 ) -> int:
     """Make a stamped PDF from a template PDF.
 
@@ -112,7 +102,7 @@ def stamp_pdf(
 
     with io.BytesIO() as buffer:
         # Create page overlaying pdf in buffer
-        _put_page_numbers(buffer, base_pdf, start_num, num_height, encl)
+        _put_page_numbers(buffer, base_pdf, start_num, num_height, encl, font)
         all_overlays = PdfReader(buffer).pages
 
         # Put logo on first page of overlay if exist
@@ -141,10 +131,15 @@ def _get_height(path: str, width: float = 1 * cm) -> float:
 
 
 def _put_text(
-    c: canvas.Canvas, line: str, pos_x: float, pos_y: float, fontsize: int = 8
+    c: canvas.Canvas,
+    line: str,
+    pos_x: float,
+    pos_y: float,
+    fontsize: int = 8,
+    font=DEFAULT_FONT,
 ) -> None:
     t = c.beginText()
-    t.setFont(FONT, fontsize)
+    t.setFont(font, fontsize)
     t.setTextOrigin(pos_x, pos_y)
     t.textLine(line)
     c.drawText(t)
@@ -158,6 +153,7 @@ def put_logo_with_text(
     pos_y: float = 272 * mm,
     logo_width: float = 18 * mm,
     fontsize: int = 8,
+    font: str = DEFAULT_FONT,
 ):
     """Put logo and text on a PDF.
 
@@ -198,7 +194,7 @@ def put_logo_with_text(
         _y = pos_y + (logo_height / 2.0 + (1.0 * mm * (len(text_lines) - 1)))
 
         for i, l in enumerate(text_lines):
-            _put_text(_canvas, l, _x, _y - (4 * mm * i), fontsize)
+            _put_text(_canvas, l, _x, _y - (4 * mm * i), fontsize, font)
 
     # Save canvas
     _canvas.save()
@@ -252,9 +248,10 @@ def put_text(
     x: float,
     y: float,
     fontsize: int = 8,
+    font: str = DEFAULT_FONT,
 ) -> None:
     def fun(_canvas):
         for i, l in enumerate(text_lines):
-            _put_text(_canvas, l, x, y - (3.2 * mm * i), fontsize)
+            _put_text(_canvas, l, x, y - (3.2 * mm * i), fontsize, font)
 
     _put_item(pdf_name, fun)
